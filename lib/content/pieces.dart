@@ -1,0 +1,128 @@
+import 'package:kharazan/models/fields.dart';
+import 'package:kharazan/models/pieces_dart.dart';
+
+class PiecessContent {
+  static final List<Piece> allPiecesInTheGame = [
+    whitePegasus,
+    blackPegasus,
+    whiteMedusa,
+    blackMedusa,
+  ];
+}
+
+final Piece whitePegasus = Piece(
+  name: 'Pegasus',
+  location: FieldTile(name: 'c5'),
+  isWhite: true,
+  moveArea: [
+    'UUL',
+    'UUR',
+    'ULL',
+    'URR',
+    'DDR',
+    'DDL',
+    'DLL',
+    'DRR',
+  ],
+  attackArea: [
+    'U',
+    'D',
+    'L',
+    'R',
+    'UR',
+    'UL',
+    'DR',
+    'DL',
+  ],
+  uniCode: 'PE',
+  attack: 4,
+  mana: 3,
+  life: 6,
+);
+final Piece blackPegasus = Piece(
+  name: 'Pegasus',
+  location: FieldTile(name: 'c6'),
+  isWhite: false,
+  moveArea: [
+    'UUL',
+    'UUR',
+    'ULL',
+    'URR',
+    'DDR',
+    'DDL',
+    'DLL',
+    'DRR',
+  ],
+  attackArea: [
+    'U',
+    'D',
+    'L',
+    'R',
+    'UR',
+    'UL',
+    'DR',
+    'DL',
+  ],
+  uniCode: 'PE',
+  attack: 4,
+  mana: 3,
+  life: 6,
+);
+final Piece whiteMedusa = Piece(
+  name: 'Medusa',
+  location: FieldTile(name: 'f3'),
+  isWhite: true,
+  moveArea: [
+    'U',
+    'D',
+    'L',
+    'R',
+    'UR',
+    'UL',
+    'DR',
+    'DL',
+  ],
+  attackArea: [
+    'U',
+    'D',
+    'L',
+    'R',
+    'UU',
+    'DD',
+    'LL',
+    'RR',
+  ],
+  uniCode: 'ME',
+  attack: 2,
+  mana: 3,
+  life: 6,
+);
+final Piece blackMedusa = Piece(
+  name: 'Medusa',
+  location: FieldTile(name: 'f6'),
+  isWhite: false,
+  moveArea: [
+    'U',
+    'D',
+    'L',
+    'R',
+    'UR',
+    'UL',
+    'DR',
+    'DL',
+  ],
+  attackArea: [
+    'U',
+    'D',
+    'L',
+    'R',
+    'UU',
+    'DD',
+    'LL',
+    'RR',
+  ],
+  uniCode: 'ME',
+  attack: 2,
+  mana: 3,
+  life: 6,
+);

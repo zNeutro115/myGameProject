@@ -1,0 +1,76 @@
+import 'package:flutter/material.dart';
+import 'package:kharazan/controllers/animations_manager.dart';
+import 'package:kharazan/controllers/match_mannager.dart';
+import 'package:kharazan/controllers/piece_manager.dart';
+import 'package:kharazan/models/pieces_dart.dart';
+import 'package:kharazan/utils/pieces_convets.dart';
+import 'package:provider/provider.dart';
+
+class PieceWidget extends StatelessWidget {
+  final double opacity;
+  final Piece? piece;
+  const PieceWidget({Key? key, this.piece, this.opacity = 1.0})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer3<PiecesManager, MatchManager, AnimationsManager>(
+        builder: (context, piecesManager, matchManager, animations, __) {
+      {
+        return Center(
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 500),
+            curve: Curves.bounceOut,
+            width: animations.heightAndWidth,
+            height: animations.heightAndWidth,
+            child: Center(
+              child: Draggable<Piece>(
+                onDragStarted: () {
+                  piecesManager.currentPiece = piece;
+                },
+                onDragEnd: (details) {
+                  piecesManager.currentPiece = null;
+                },
+                data: piece,
+                child: InkWell(
+                  onTap: () {
+                    Converts.getCurrentFieldState(
+                      field: matchManager.matchField,
+                      pieces: piecesManager.piecesInGame,
+                      isWhite: matchManager.isWhite,
+                      blackMana: matchManager.blackMana,
+                      whiteMana: matchManager.whiteMana,
+                    );
+                    if (piecesManager.currentPiece == null) {
+                      piecesManager.currentPiece = piece;
+                    } else {
+                      piecesManager.currentPiece = null;
+                    }
+                  },
+                  child: SizedBox(
+                    width: 95,
+                    height: 95,
+                    child: Image.asset(piece!.image),
+                  ),
+                ),
+                feedback: SizedBox(
+                  width: 95,
+                  height: 95,
+                  child: Image.asset(piece!.image),
+                ),
+                childWhenDragging: Opacity(
+                  opacity: 0.7,
+                  child: SizedBox(
+                    width: 95,
+                    height: 95,
+                    child: Image.asset(piece!.image),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+    });
+  }
+}

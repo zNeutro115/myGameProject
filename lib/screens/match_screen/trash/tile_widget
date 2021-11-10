@@ -1,0 +1,172 @@
+import 'package:flutter/material.dart';
+import 'package:kharazan/controllers/match_mannager.dart';
+import 'package:kharazan/controllers/piece_manager.dart';
+import 'package:kharazan/models/pieces_dart.dart';
+import 'package:kharazan/screens/match_screen/widgets/piece_information.dart';
+import 'package:kharazan/screens/match_screen/widgets/piece_widget.dart';
+import 'package:kharazan/utils/pieces_convets.dart';
+import 'package:provider/provider.dart';
+
+class TileWidget extends StatelessWidget {
+  final bool isWhite;
+  final int index;
+  final String tileIndentifier;
+  const TileWidget(
+    this.isWhite,
+    this.index, {
+    Key? key,
+    required this.tileIndentifier,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // print('buildou: $index');
+    return Consumer2<PiecesManager, MatchManager>(
+      builder: (context, piecesManager, matchManager, __) {
+        Piece? piece;
+        piecesManager.piecesInGame.forEach((element) {
+          if (element.location == tileIndentifier) {
+            piece = element;
+          }
+        });
+        return Center(
+          child: Container(
+            width: 100,
+            height: 100,
+            child: DragTarget<Piece>(
+              onAccept: (commingPiece) {
+                String move = commingPiece.location + tileIndentifier;
+                piecesManager.makeMove(move);
+
+                matchManager.isWhite
+                    ? matchManager.whiteMana =
+                        matchManager.whiteMana - commingPiece.mana
+                    : matchManager.blackMana =
+                        matchManager.blackMana - commingPiece.mana;
+                matchManager.addAnotation(
+                  move,
+                  Converts.getCurrentFieldState(
+                    field: piecesManager.matchField,
+                    pieces: piecesManager.piecesInGame,
+                    isWhite: matchManager.isWhite,
+                    blackMana: matchManager.blackMana,
+                    whiteMana: matchManager.whiteMana,
+                  ),
+                );
+              },
+              onWillAccept: (data) {
+                if (piecesManager.currentPiece == null) return false;
+                if (data == null) return false;
+                if (piecesManager.possibleAttacks.contains(tileIndentifier) &&
+                    piece != null) return true;
+                if (piecesManager.possibleMoves.contains(tileIndentifier)) {
+                  print('VAI ACEITAR');
+                  return true;
+                }
+                return false;
+              },
+              builder: (context, _, __) {
+                return Container(
+                  color:
+                      piecesManager.possibleAttacks.contains(tileIndentifier) &&
+                              piece != null
+                          ? isWhite
+                              ? piecesManager.matchField.attackedWhiteColor
+                              : piecesManager.matchField.attackedBlackColor
+                          : isWhite
+                              ? piecesManager.matchField.whiteColor
+                              : piecesManager.matchField.blackColor,
+                  child: Stack(
+                    children: [
+                      if (piece != null) PieceWidget(piece: piece),
+                      if (piecesManager.possibleAttacks
+                              .contains(tileIndentifier) &&
+                          piece == null)
+                        Center(
+                          child: Container(
+                            height: 50,
+                            width: 50,
+                            color: Colors.red[400],
+                          ),
+                        ),
+                      if (piecesManager.possibleMoves
+                              .contains(tileIndentifier) &&
+                          piece == null)
+                        Center(
+                          child: Container(
+                            height: 30,
+                            width: 30,
+                            decoration: BoxDecoration(
+                              color: Colors.green[300],
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            tileIndentifier,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                      if ((piece == null &&
+                              piecesManager.currentPiece != null) ||
+                          piecesManager.possibleAttacks
+                              .contains(tileIndentifier))
+                        InkWell(
+                          onTap: (piecesManager.possibleAttacks
+                                          .contains(tileIndentifier) &&
+                                      piece != null) ||
+                                  piecesManager.possibleMoves
+                                      .contains(tileIndentifier)
+                              ? () {
+                                  String move =
+                                      piecesManager.currentPiece!.location +
+                                          tileIndentifier;
+                                  piecesManager.makeMove(move);
+
+                                  matchManager.isWhite
+                                      ? matchManager.whiteMana =
+                                          matchManager.whiteMana -
+                                              piecesManager.currentPiece!.mana
+                                      : matchManager.blackMana =
+                                          matchManager.blackMana -
+                                              piecesManager.currentPiece!.mana;
+                                  matchManager.addAnotation(
+                                    move,
+                                    Converts.getCurrentFieldState(
+                                      field: piecesManager.matchField,
+                                      pieces: piecesManager.piecesInGame,
+                                      isWhite: matchManager.isWhite,
+                                      blackMana: matchManager.blackMana,
+                                      whiteMana: matchManager.whiteMana,
+                                    ),
+                                  );
+                                  piecesManager.currentPiece = null;
+                                }
+                              : null,
+                          child: Container(
+                            width: double.maxFinite,
+                            height: double.maxFinite,
+                            color: Colors.transparent,
+                          ),
+                        ),
+                      if (piece != null) PieceAttachedInfo(piece: piece!),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
